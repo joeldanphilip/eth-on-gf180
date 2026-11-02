@@ -1,5 +1,20 @@
 # Current measured status
 
+## Latest physical ECO checkpoint — 2026-11-02
+
+The strongest legally routed/extracted candidate is split7. It has zero final
+detailed-route violations, zero antenna violations, a 593,276-pin power audit
+with zero bad pins, and extracted WC setup slack of -0.778950 ns. WC electrical
+checks pass; BC/TC still fail max-slew, so physical timing closure is not
+achieved and no GDS is accepted. The preserved fallback is split6 (WC setup
+-0.862076 ns). The ECO sequence split seven localized high-fanout bank-select
+branches; the improvement from split2 to split7 was approximately 0.357 ns.
+
+The remaining issue is architectural/distributed banked-mux fanout, not the
+GF180 technology-file selection. No physical SRAM macro is available in the
+workspace: the discovered SRAM file is Liberty-only test collateral without
+matching LEF/GDS/CDL/RC views. Do not claim SRAM-backed closure.
+
 **125 MHz pre-layout setup/hold closure is achieved** for the 4096-entry TX/RX
 MAC using GF180MCU 180 nm, nine-track cells at the native 5 V operating range.
 The exact replayed netlist passes SS/FF setup/hold and TT checks, with zero TNS:

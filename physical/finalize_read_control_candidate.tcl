@@ -1,6 +1,6 @@
 # Finish the localized read-control ECO without replacing the clean 5_route DB.
 source $::env(SCRIPTS_DIR)/load.tcl
-load_design 5_read_control_worst_buffer_moved2_route.odb 5_read_control_worst_buffer_moved2.sdc
+load_design 5_read_control_worst_buffer_split7_route.odb 5_read_control_worst_buffer_split7_legalized.sdc
 
 set_propagated_clock [all_clocks]
 global_connect

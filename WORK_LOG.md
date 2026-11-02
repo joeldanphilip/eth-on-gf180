@@ -15,6 +15,40 @@ unchanged. `SOURCES.md` records revisions and licensing. The repository is
 deprecated upstream; the pinned Verilog version was selected for compatibility
 with the Yosys flow.
 
+## 2026-11-02 — physical ECO continuation and current boundary
+
+The GitHub source snapshot was pushed to `git@github.com:joeldanphilip/eth-on-gf180.git`
+on `main` at commit `bf2f984`. Generated build databases were retained locally
+for reproducibility; obsolete ECO databases were removed after authorization,
+freeing roughly 34 GB. The source-only repository excludes `build/`, `tools/`,
+and virtual-environment artifacts.
+
+The GF180 physical flow uses the vendored 5LM/1TM, 9-track, 9K standard-cell
+views (`gf180mcu_5LM_1TM_9K_9t`) at the native 5 V range, with 8 ns clocks. A
+workspace audit found no physical SRAM macro collateral. The Liberty-only
+`gf180mcu_sram.lib.gz` test model is not sufficient for LEF/GDS/CDL/RC-backed
+macro integration.
+
+The accepted ECO lineage is preserved under
+`build/physical_pipeline_layout/results/gf180/ethernet_pipeline_4096/base/`:
+
+| Candidate | Physical result | Extracted WC setup |
+| --- | --- | ---: |
+| split2 | DRT 0, antenna 0, legal after finalization | -1.136206 ns |
+| split3 | DRT 0, antenna 0; legalized ECO | -0.980902 ns |
+| split4 | DRT 0, antenna 0; legalized ECO | -0.961612 ns |
+| split5 | DRT 0, antenna 0; WC electrical clean | -0.862076 ns |
+| split6 | DRT 0, antenna 0 | -0.862076 ns |
+| split7 | DRT 0, antenna 0; strongest current candidate | -0.778950 ns |
+
+Each split was a localized buffer insertion on a high-fanout bank-select or
+banked-mux net, followed by detailed placement legalization, full detailed
+routing, antenna checking, filler insertion, power connectivity audit, RC
+extraction, and WC/BC/TC STA. Split7 passes WC electrical checks but BC/TC
+max-slew remains failing; setup is still negative at WC. Therefore no GDS is
+claimed, and the next engineering step is a structural FIFO/mux partition or a
+real SRAM macro with complete physical collateral, not a blind GDS stream-out.
+
 At GMII, eight data bits per 125 MHz cycle provide 1 Gb/s raw line rate. The
 host AXI interface can stall; the receive PHY cannot. RX buffering and whole
 frame drop/recovery behavior therefore matter as much as handshake behavior.

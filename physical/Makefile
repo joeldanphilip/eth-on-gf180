@@ -181,6 +181,75 @@ eco-move-second-worst-buffer:
 .PHONY: eco-route-second-worst-buffer
 eco-route-second-worst-buffer:
 	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_second_worst:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_moved2.tcl' eco_route_second_worst
+.PHONY: eco-move-third-worst-buffer
+eco-move-third-worst-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_move_third_worst:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/move_third_worst_buffer_near_aoi.tcl' eco_move_third_worst
+.PHONY: eco-route-third-worst-buffer
+eco-route-third-worst-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_third_worst:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_moved3.tcl' eco_route_third_worst
+.PHONY: eco-insert-worst-fanout-buffer
+eco-insert-worst-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_insert_worst_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/insert_worst_fanout_buffer.tcl' eco_insert_worst_fanout_buffer
+.PHONY: eco-route-worst-fanout-buffer
+eco-route-worst-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_worst_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_split.tcl' eco_route_worst_fanout_buffer
+.PHONY: eco-insert-second-fanout-buffer
+eco-insert-second-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_insert_second_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/insert_second_fanout_buffer.tcl' eco_insert_second_fanout_buffer
+.PHONY: eco-route-second-fanout-buffer
+eco-route-second-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_second_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_split2.tcl' eco_route_second_fanout_buffer
+.PHONY: eco-insert-third-fanout-buffer
+eco-insert-third-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_insert_third_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/insert_third_fanout_buffer.tcl' eco_insert_third_fanout_buffer
+.PHONY: eco-route-third-fanout-buffer
+eco-route-third-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_third_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_split3.tcl' eco_route_third_fanout_buffer
+.PHONY: eco-check-split3-placement
+eco-check-split3-placement:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_check_split3_placement:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/check_split3_placement.tcl' eco_check_split3_placement
+.PHONY: eco-legalize-split3
+eco-legalize-split3:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_split3:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_read_control_split3.tcl' eco_legalize_split3
+.PHONY: eco-route-legalized-split3
+eco-route-legalized-split3:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_legalized_split3:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_split3_legalized.tcl' eco_route_legalized_split3
+.PHONY: eco-insert-fourth-fanout-buffer
+eco-insert-fourth-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_insert_fourth_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/insert_fourth_fanout_buffer.tcl' eco_insert_fourth_fanout_buffer
+.PHONY: eco-legalize-split4
+eco-legalize-split4:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_split4:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_read_control_split4.tcl' eco_legalize_split4
+.PHONY: eco-route-split4
+eco-route-split4:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_split4:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_split4.tcl' eco_route_split4
+.PHONY: eco-insert-fifth-fanout-buffer
+eco-insert-fifth-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_insert_fifth_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/insert_fifth_fanout_buffer.tcl' eco_insert_fifth_fanout_buffer
+.PHONY: eco-legalize-split5
+eco-legalize-split5:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_split5:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_read_control_split5.tcl' eco_legalize_split5
+.PHONY: eco-route-split5
+eco-route-split5:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_split5:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_split5.tcl' eco_route_split5
+.PHONY: eco-insert-sixth-fanout-buffer
+eco-insert-sixth-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_insert_sixth_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/insert_sixth_fanout_buffer.tcl' eco_insert_sixth_fanout_buffer
+.PHONY: eco-legalize-split6
+eco-legalize-split6:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_split6:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_read_control_split6.tcl' eco_legalize_split6
+.PHONY: eco-route-split6
+eco-route-split6:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_split6:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_split6.tcl' eco_route_split6
+.PHONY: eco-insert-seventh-fanout-buffer
+eco-insert-seventh-fanout-buffer:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_insert_seventh_fanout_buffer:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/insert_seventh_fanout_buffer.tcl' eco_insert_seventh_fanout_buffer
+.PHONY: eco-legalize-split7
+eco-legalize-split7:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_split7:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_read_control_split7.tcl' eco_legalize_split7
+.PHONY: eco-route-split7
+eco-route-split7:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_split7:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_split7.tcl' eco_route_split7
 .PHONY: eco-resize-read-controls-round2
 eco-resize-read-controls-round2:
 	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_read_controls_resize_round2:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/resize_read_controls_round2.tcl' eco_read_controls_resize_round2
