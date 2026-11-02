@@ -1,0 +1,19 @@
+[tasks]
+bmc
+cover
+[options]
+bmc: mode bmc
+cover: mode cover
+bmc: depth 100
+cover: depth 320
+multiclock on
+[engines]
+smtbmc bitwuzla
+[script]
+read -formal -D PERIODIC_CLOCKS -D FRAME_MODE -D REGISTER_FULL_FLAGS -D ELASTIC_READ -D FAST_CONTROL -D REGISTER_EMPTY -D FULL_LOOKAHEAD -D WRITE_AHEAD -D READ_ONEHOT -D DECOUPLE_READ axis_async_fifo_banked.v fifo_harness.sv
+prep -top fifo_harness
+async2sync
+dffunmap
+[files]
+rtl/axis_async_fifo_banked.v
+formal/fifo_harness.sv

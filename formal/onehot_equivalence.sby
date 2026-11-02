@@ -1,0 +1,23 @@
+[tasks]
+bmc
+cover
+[options]
+bmc: mode bmc
+cover: mode cover
+depth 100
+multiclock on
+[engines]
+smtbmc bitwuzla
+[script]
+read_verilog -formal axis_async_fifo.v
+rename axis_async_fifo reference_fifo
+read -formal -D ONEHOT_WRITE axis_async_fifo_banked.v banked_equivalence.sv
+prep -top banked_equivalence
+memory_map
+opt -full
+async2sync
+dffunmap
+[files]
+vendor/verilog-ethernet/lib/axis/rtl/axis_async_fifo.v
+rtl/axis_async_fifo_banked.v
+formal/banked_equivalence.sv

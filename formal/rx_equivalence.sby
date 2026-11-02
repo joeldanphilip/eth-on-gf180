@@ -1,0 +1,20 @@
+[tasks]
+bmc
+cover
+[options]
+bmc: mode bmc
+cover: mode cover
+depth 40
+[engines]
+smtbmc bitwuzla
+[script]
+read -formal -D SIMULATION lfsr.v
+read_verilog -formal axis_gmii_rx.v
+rename axis_gmii_rx reference_rx
+read -formal axis_gmii_rx_lookahead.v rx_equivalence.sv
+prep -top rx_equivalence
+[files]
+vendor/verilog-ethernet/rtl/lfsr.v
+vendor/verilog-ethernet/rtl/axis_gmii_rx.v
+rtl/axis_gmii_rx_lookahead.v
+formal/rx_equivalence.sv

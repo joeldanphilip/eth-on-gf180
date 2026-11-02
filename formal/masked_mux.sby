@@ -1,0 +1,10 @@
+[options]
+mode prove
+depth 1
+[engines]
+smtbmc bitwuzla
+[script]
+read -formal masked_mux_harness.sv
+prep -top masked_mux_harness
+[files]
+formal/masked_mux_harness.sv

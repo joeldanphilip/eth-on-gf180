@@ -1,0 +1,18 @@
+[tasks]
+tx
+rx
+[options]
+mode prove
+depth 8
+multiclock on
+[engines]
+smtbmc bitwuzla
+[script]
+read_verilog -formal -D ONEHOT_WRITE -D REGISTER_FULL_FLAGS -D ELASTIC_READ -D FAST_CONTROL -D REGISTER_EMPTY -D FULL_LOOKAHEAD axis_async_fifo_banked.v
+tx: chparam -set DEPTH 4096 -set DATA_WIDTH 8 -set KEEP_ENABLE 0 -set RAM_PIPELINE 2 -set FRAME_FIFO 1 -set DROP_BAD_FRAME 1 -set DROP_WHEN_FULL 0 axis_async_fifo
+rx: chparam -set DEPTH 4096 -set DATA_WIDTH 8 -set KEEP_ENABLE 0 -set RAM_PIPELINE 2 -set FRAME_FIFO 1 -set DROP_BAD_FRAME 1 -set DROP_WHEN_FULL 1 axis_async_fifo
+prep -top axis_async_fifo
+async2sync
+dffunmap
+[files]
+rtl/axis_async_fifo_banked.v

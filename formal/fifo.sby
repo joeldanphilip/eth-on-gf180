@@ -1,0 +1,29 @@
+[tasks]
+bmc
+cover
+periodic
+
+[options]
+bmc: mode bmc
+cover: mode cover
+periodic: mode bmc
+depth 30
+periodic: depth 60
+multiclock on
+
+[engines]
+bmc: smtbmc z3
+cover: smtbmc z3
+periodic: smtbmc yices
+
+[script]
+bmc: read -formal axis_async_fifo.v fifo_harness.sv
+cover: read -formal axis_async_fifo.v fifo_harness.sv
+periodic: read -formal -D PERIODIC_CLOCKS axis_async_fifo.v fifo_harness.sv
+prep -top fifo_harness
+async2sync
+dffunmap
+
+[files]
+vendor/verilog-ethernet/lib/axis/rtl/axis_async_fifo.v
+formal/fifo_harness.sv

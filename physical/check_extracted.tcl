@@ -1,0 +1,52 @@
+source $::env(SCRIPTS_DIR)/load.tcl
+set stage 5_route
+if {[info exists ::env(SIGNOFF_STAGE)]} {set stage $::env(SIGNOFF_STAGE)}
+if {$stage ni {5_route 6_final}} {error "Unsupported timing checkpoint $stage"}
+load_design ${stage}.odb ${stage}.sdc
+puts "EXTRACTED_TIMING_CHECKPOINT $stage"
+set_propagated_clock [all_clocks]
+set summary [open $::env(REPORTS_DIR)/extracted_corner_slacks.csv w]
+puts $summary "corner,check,slack_ns"
+set timing_failed 0
+foreach corner {WC BC TC} {
+  read_spef -corner $corner $::env(RESULTS_DIR)/6_${corner}.spef
+  set path $::env(REPORTS_DIR)/extracted_${corner}_timing.rpt
+  report_checks -scenes [list $corner] -path_delay min_max -group_path_count 5 \
+    -format full_clock_expanded -fields {slew cap fanout} > $path
+  foreach kind {min max} {
+    set paths [find_timing_paths -scenes [list $corner] -path_delay $kind -group_path_count 1 -sort_by_slack]
+    if {![llength $paths]} {error "No constrained $kind timing paths in $corner"}
+    set worst 1e30
+    foreach timing_path $paths {
+      set slack [get_property $timing_path slack]
+      if {$slack < $worst} {set worst $slack}
+    }
+    puts $summary "$corner,$kind,$worst"
+    puts "EXTRACTED_CORNER_SLACK $corner $kind $worst"
+    if {$worst < 0} {set timing_failed 1}
+  }
+  set electrical $::env(REPORTS_DIR)/extracted_${corner}_electrical.rpt
+  report_check_types -scenes [list $corner] -max_slew -max_capacitance \
+    -violators -max_count 20 -digits 9 > $electrical
+  set efd [open $electrical r]
+  set violations [regexp {\(VIOLATED\)} [read $efd]]
+  close $efd
+  puts "EXTRACTED_CORNER_ELECTRICAL $corner has_violations=$violations report=$electrical"
+  if {$violations} {set timing_failed 1}
+}
+close $summary
+set slew_slack [sta::max_slew_check_slack]
+set cap_slack [sta::max_capacitance_check_slack]
+puts "EXTRACTED_ELECTRICAL_SLACK max_slew=$slew_slack max_capacitance=$cap_slack"
+if {$slew_slack < 0 || $cap_slack < 0} {set timing_failed 1}
+set physical_qor_stage extracted_all_corners
+source /home/joelphilip/Documents/ethernet_formal/physical/qor.tcl
+foreach domain {logic tx rx} {
+  if {abs([get_property [get_clocks $domain] period] - 8.0) > 1e-6} {
+    error "Clock $domain no longer has the requested 8 ns period"
+  }
+}
+if {$timing_failed} {error "Extracted timing/electrical closure failed; see per-corner reports"}
+foreach power_net {VDD VSS} {
+  check_power_grid -net $power_net -error_file $::env(REPORTS_DIR)/${power_net}_connectivity.rpt
+}

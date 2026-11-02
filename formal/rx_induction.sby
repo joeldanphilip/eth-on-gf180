@@ -1,0 +1,23 @@
+[tasks]
+prove
+cover
+[options]
+prove: mode prove
+cover: mode cover
+depth 12
+[engines]
+smtbmc bitwuzla
+[script]
+read -formal -D SIMULATION lfsr.v
+read_verilog -formal axis_gmii_rx.v
+rename axis_gmii_rx reference_rx
+read_verilog -formal axis_gmii_rx_lookahead.v
+expose reference_rx/crc_next reference_rx/state_reg reference_rx/gmii_rxd_d* reference_rx/gmii_rx_dv_d* reference_rx/gmii_rx_er_d* reference_rx/mii_odd reference_rx/in_frame
+expose axis_gmii_rx/crc_state axis_gmii_rx/state_reg axis_gmii_rx/gmii_rxd_d* axis_gmii_rx/gmii_rx_dv_d* axis_gmii_rx/gmii_rx_er_d* axis_gmii_rx/mii_odd axis_gmii_rx/in_frame
+read -formal rx_induction.sv
+prep -top rx_induction
+[files]
+vendor/verilog-ethernet/rtl/lfsr.v
+vendor/verilog-ethernet/rtl/axis_gmii_rx.v
+rtl/axis_gmii_rx_lookahead.v
+formal/rx_induction.sv

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+task_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+export LD_LIBRARY_PATH="$task_root/tools/openroad_runtime/usr/lib/x86_64-linux-gnu:$task_root/tools/openroad_prebuilt/opt/or-tools/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+exec "$task_root/tools/openroad_prebuilt/usr/bin/sta" "$@"

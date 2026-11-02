@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+task_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+export LD_LIBRARY_PATH="$task_root/tools/klayout_030_runtime/usr/lib/klayout:$task_root/tools/klayout_runtime/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export QT_QPA_PLATFORM=offscreen
+exec "$task_root/tools/klayout_030_runtime/usr/bin/klayout" "$@"

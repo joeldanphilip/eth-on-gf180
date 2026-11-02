@@ -1,0 +1,13 @@
+[options]
+mode prove
+depth 8
+multiclock on
+[engines]
+smtbmc bitwuzla
+[script]
+read -formal replication_equivalence.sv
+prep -top replication_equivalence
+async2sync
+dffunmap
+[files]
+formal/replication_equivalence.sv

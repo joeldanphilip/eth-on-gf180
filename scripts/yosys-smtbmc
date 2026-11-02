@@ -1,0 +1,4 @@
+#!/bin/sh
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+export PYTHONPATH="$root/tools/yosys-src/backends/smt2"
+exec /usr/bin/python3 /home/joelphilip/Documents/dft/oss-cad-suite/libexec/yosys-smtbmc "$@"

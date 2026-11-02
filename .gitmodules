@@ -1,0 +1,3 @@
+[submodule "vendor/verilog-ethernet"]
+	path = vendor/verilog-ethernet
+	url = https://github.com/alexforencich/verilog-ethernet.git

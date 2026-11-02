@@ -1,0 +1,4 @@
+#!/bin/sh
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+suite=${OSS:-/home/joelphilip/Documents/dft/oss-cad-suite}
+exec "$root/tools/yosys-runtime/lib/ld-linux-x86-64.so.2" --inhibit-cache --inhibit-rpath '' --library-path "$suite/lib" "$suite/libexec/yosys" "$@"
