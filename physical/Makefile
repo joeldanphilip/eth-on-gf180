@@ -315,6 +315,16 @@ eco-legalize-setup-combined:
 .PHONY: eco-route-setup-combined
 eco-route-setup-combined:
 	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_setup_combined:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_setup_combined.tcl' eco_route_setup_combined
+.PHONY: eco-finish-setup-combined
+eco-finish-setup-combined:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_finish_setup_combined:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/finalize_setup_combined.tcl' eco_finish_setup_combined
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_report_setup_combined:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/report_setup_combined.tcl' eco_report_setup_combined
+.PHONY: eco-extract-setup-combined
+eco-extract-setup-combined:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_extract_setup_combined:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/extract_setup_combined.tcl' eco_extract_setup_combined
+.PHONY: eco-check-setup-combined
+eco-check-setup-combined:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_check_setup_combined:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/check_setup_combined.tcl' eco_check_setup_combined
 .PHONY: eco-finish-setup-place25436
 eco-finish-setup-place25436:
 	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_finish_setup_place25436:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/finalize_setup_place25436.tcl' eco_finish_setup_place25436

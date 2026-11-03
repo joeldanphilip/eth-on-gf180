@@ -91,6 +91,13 @@ build/gf180/physical_pipeline_elaborated.il: $(GF_CLOSURE_RTL)
 	yosys -Q -T -p 'read_verilog -D SIMULATION -D ONEHOT_WRITE -D REGISTER_FULL_FLAGS -D ELASTIC_READ -D FAST_CONTROL -D REGISTER_EMPTY -D FULL_LOOKAHEAD -D WRITE_AHEAD -D READ_ONEHOT -D DECOUPLE_READ -D READ_BANK_ONEHOT -D PIPELINED_WRITE -defer $(GF_CLOSURE_RTL); chparam -set TX_FIFO_RAM_PIPELINE 2 -set RX_FIFO_RAM_PIPELINE 2 eth_mac_1g_fifo; hierarchy -top eth_mac_1g_fifo; write_rtlil $@' > build/gf180/physical_pipeline_elaboration.log
 gf180-physical-pipeline:
 	$(MAKE) -f sta/gf180.mk GF_BUILD=build/gf180_physical_pipeline GF_ELAB=build/gf180/physical_pipeline_elaborated.il GF_SIZED=1 GF_DELAY=5000 GF_TT=tt_025C_5v00 GF_SS=ss_125C_4v50 GF_FF=ff_n40C_5v50 gf180-map build/gf180_physical_pipeline/tt.lib build/gf180_physical_pipeline/ff.lib
+
+.PHONY: gf180-physical-pipeline-deep
+build/gf180/physical_pipeline_deep_elaborated.il: $(GF_CLOSURE_RTL)
+	mkdir -p build/gf180
+	yosys -Q -T -p 'read_verilog -D SIMULATION -D ONEHOT_WRITE -D REGISTER_FULL_FLAGS -D ELASTIC_READ -D FAST_CONTROL -D REGISTER_EMPTY -D FULL_LOOKAHEAD -D WRITE_AHEAD -D READ_ONEHOT -D DECOUPLE_READ -D READ_BANK_ONEHOT -D PIPELINED_WRITE -defer $(GF_CLOSURE_RTL); chparam -set TX_FIFO_RAM_PIPELINE 3 -set RX_FIFO_RAM_PIPELINE 3 eth_mac_1g_fifo; hierarchy -top eth_mac_1g_fifo; write_rtlil $@' > build/gf180/physical_pipeline_deep_elaboration.log
+gf180-physical-pipeline-deep:
+	$(MAKE) -f sta/gf180.mk GF_BUILD=build/gf180_physical_pipeline_deep GF_ELAB=build/gf180/physical_pipeline_deep_elaborated.il GF_SIZED=1 GF_DELAY=5000 GF_TT=tt_025C_5v00 GF_SS=ss_125C_4v50 GF_FF=ff_n40C_5v50 gf180
 build/gf180/registered_lowmux_elaborated.il: $(GF_CLOSURE_RTL) rtl/axis_async_fifo_banked.v
 	mkdir -p build/gf180
 	yosys -Q -T -p 'read_verilog -D SIMULATION -D ONEHOT_WRITE -D REGISTER_FULL_FLAGS -D LOW_MUX_ROWS -defer $(GF_CLOSURE_RTL); chparam -set TX_FIFO_RAM_PIPELINE 2 -set RX_FIFO_RAM_PIPELINE 2 eth_mac_1g_fifo; hierarchy -top eth_mac_1g_fifo; write_rtlil $@' > build/gf180/registered_lowmux_elaboration.log

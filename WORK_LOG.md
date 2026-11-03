@@ -1174,3 +1174,25 @@ Cleanup removed superseded split2–split6, moved, top-electrical, and isolated
 resize databases/DEFs/SPEFs while retaining source scripts, logs, reports,
 split7, baseline 5_route/6_final, and the combined route/legalized SDC. Free
 space increased from about 8 GB to about 50 GB.
+
+## 2026-11-03 — authorized final closure attempts
+
+The two authorized closure attempts are complete. Attempt 1 was the structural
+read-side pipeline change (`RAM_PIPELINE=3`). Verilator multiclock and upstream
+regressions passed 2/2. The deep FIFO formal job passed bounded safety, cover,
+and direct TX/RX k-induction. GF180 pre-layout STA improved to approximately
+-0.0774 ns setup and +0.0105 ns hold at the slow corner, but this was not a
+physical signoff result.
+
+Attempt 2 was one full GF180 physical implementation of that pipeline-3
+netlist. Placement, CTS, global routing, detailed routing, filler insertion,
+RC extraction, and GDS merge completed. Detailed routing converged to zero DRC
+violations; final antenna checks reported zero net and zero pin violations;
+the merged GDS reported matching LEF/GDS cells and no orphan cells. The final
+artifacts are under `build/physical_pipeline_deep/results/gf180/ethernet_pipeline_deep_4096/base/`.
+
+The extracted 125 MHz result is **not timing closed**: worst setup slack is
+-1.6206 ns and worst hold slack is +0.0654 ns. Therefore this is a valid
+routed/GDS experiment with clean routing and antenna checks, not a signoff-ready
+Ethernet MAC. The two-attempt limit is exhausted; further closure would require
+a new architectural/physical strategy rather than another buffer-only ECO.

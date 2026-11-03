@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+exec env PYTHONPATH="$repo_root/tools/yosys-src/backends/smt2${PYTHONPATH:+:$PYTHONPATH}" \
+  /usr/bin/python3 /home/joelphilip/Documents/dft/oss-cad-suite/libexec/yosys-smtbmc "$@"

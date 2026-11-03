@@ -22,7 +22,9 @@ module fifo_harness;
   (* anyseq *) reg [FORMAL_DATA_WIDTH-1:0] data;
   (* anyseq *) reg valid, ready, last;
   wire sr, mv, ml; wire [FORMAL_DATA_WIDTH-1:0] md;
-`ifdef REGISTER_FULL_FLAGS
+`ifdef DEEP_READ_PIPELINE
+  localparam FORMAL_PIPELINE=3;
+`elsif REGISTER_FULL_FLAGS
   localparam FORMAL_PIPELINE=2;
 `else
   localparam FORMAL_PIPELINE=1;

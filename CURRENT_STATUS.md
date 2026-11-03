@@ -303,3 +303,12 @@ using 87 hash-verified archives of inactive netlists/library copies; see
 The earlier cleanup removed the superseded baseline, decoupled,
 25%-utilization and 6LM/7t result trees, including their compressed databases.
 The compression inventory is historical; those removed files must be rebuilt.
+
+## Final status — 2026-11-03
+
+The final authorized pipeline-3 physical run completed GDS generation. The
+layout is detailed-route clean (0 DRC violations) and antenna clean (0 net/pin
+violations), with no orphan GDS cells. However, extracted 125 MHz STA reports
+worst setup slack **-1.6206 ns** and worst hold slack **+0.0654 ns**. Timing
+closure is therefore not achieved. The two planned closure attempts are
+exhausted; do not claim this GDS as timing-signoff-ready.

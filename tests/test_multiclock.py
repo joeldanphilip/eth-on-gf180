@@ -91,22 +91,24 @@ def test_multiclock():
     banked = os.environ.get('BANKED_FIFO') == '1'
     if banked:
         sources = [ROOT/'rtl/axis_async_fifo_banked.v' if x.name == 'axis_async_fifo.v' else x for x in sources]
-        parameters.update(TX_FIFO_RAM_PIPELINE=2, RX_FIFO_RAM_PIPELINE=2)
+        read_pipeline = int(os.environ.get('FIFO_RAM_PIPELINE', '2'))
+        parameters.update(TX_FIFO_RAM_PIPELINE=read_pipeline, RX_FIFO_RAM_PIPELINE=read_pipeline)
     closure = os.environ.get('CLOSURE_RTL') == '1'
     registered = os.environ.get('REGISTERED_FIFO') == '1'
-    lookahead_args = ['-D', 'FULL_LOOKAHEAD'] if os.environ.get('FULL_LOOKAHEAD') == '1' else []
+    lookahead_args = ['-DFULL_LOOKAHEAD'] if os.environ.get('FULL_LOOKAHEAD') == '1' else []
     if os.environ.get('WRITE_AHEAD') == '1':
-        lookahead_args += ['-D', 'WRITE_AHEAD']
+        lookahead_args += ['-DWRITE_AHEAD']
     if os.environ.get('READ_ONEHOT') == '1':
-        lookahead_args += ['-D', 'READ_ONEHOT']
+        lookahead_args += ['-DREAD_ONEHOT']
     if os.environ.get('DECOUPLE_READ') == '1':
-        lookahead_args += ['-D', 'DECOUPLE_READ']
+        lookahead_args += ['-DDECOUPLE_READ']
     if os.environ.get('PHYSICAL_PIPELINE') == '1':
-        lookahead_args += ['-D', 'READ_BANK_ONEHOT', '-D', 'PIPELINED_WRITE']
+        lookahead_args += ['-DREAD_BANK_ONEHOT', '-DPIPELINED_WRITE']
     if closure:
         sources = [ROOT/'rtl/axis_gmii_rx_lookahead.v' if x.name == 'axis_gmii_rx.v' else x for x in sources]
+    simulator_args = ['--Wno-fatal'] if os.environ.get('SIM') == 'verilator' else []
     run(verilog_sources=[str(x) for x in sources], toplevel='eth_mac_1g_fifo',
         module='test_multiclock', python_search=[str(ROOT/'tests')],
         parameters=parameters,
-        compile_args=lookahead_args + (['-D','ONEHOT_WRITE'] if closure else []) + (['-D','REGISTER_FULL_FLAGS'] if registered else []) + (['-D','ELASTIC_READ'] if os.environ.get('ELASTIC_READ') == '1' else []) + (['-D','FAST_CONTROL'] if os.environ.get('FAST_CONTROL') == '1' else []) + (['-D','REGISTER_EMPTY'] if os.environ.get('REGISTER_EMPTY') == '1' else []),
+            compile_args=simulator_args + lookahead_args + (['-DONEHOT_WRITE'] if closure else []) + (['-DREGISTER_FULL_FLAGS'] if registered else []) + (['-DELASTIC_READ'] if os.environ.get('ELASTIC_READ') == '1' else []) + (['-DFAST_CONTROL'] if os.environ.get('FAST_CONTROL') == '1' else []) + (['-DREGISTER_EMPTY'] if os.environ.get('REGISTER_EMPTY') == '1' else []),
         sim_build=str(ROOT/(f'build/multiclock_physical_pipeline_{FIFO_DEPTH}' if os.environ.get('PHYSICAL_PIPELINE') == '1' else f'build/multiclock_registered_{FIFO_DEPTH}' if registered else f'build/multiclock_closure_{FIFO_DEPTH}' if closure else f'build/multiclock_banked_{FIFO_DEPTH}' if banked else 'build/multiclock')))
