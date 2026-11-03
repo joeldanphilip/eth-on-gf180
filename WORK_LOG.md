@@ -1142,3 +1142,35 @@ not claim physical timing closure, routed DRC closure, LVS, extracted STA,
 power/IR signoff, or GDS signoff. The actionable fix is physical architecture
 and floorplan work—SRAM/macro-backed FIFOs or partitioning plus clock/fanout
 reduction—not lowering the clock or hiding the failure with constraints.
+
+## 2026-11-03 — top electrical cleanup and combined setup ECO
+
+The 14-buffer top electrical branch was rejected by detailed routing at 106
+Metal1/Metal2 spacing violations. A four-buffer branch reduced transient DRT
+congestion and ultimately reached zero final DRT violations and zero antenna
+violations. After power/filler finalization and all-corner extraction, it did
+not improve timing: WC setup remained -0.778950 ns, WC hold +0.482341 ns, BC
+setup +4.095444 ns, TC setup +2.720752 ns. WC electrical checks passed, while
+BC/TC retained the existing max-slew failure (global max-slew slack
+-0.933545708656311).
+
+The extracted WC critical path identified a distributed bank-select chain. A
+localized place24936 `buf_8 -> buf_20` ECO was legalized (max displacement
+0.6 um), routed with zero final DRT violations and zero antenna violations,
+and extracted across all three corners; it left WC setup at -0.778950 ns and
+moved the dominant path to place25436. A separate place25436 `buf_12 ->
+buf_20` ECO was legalized (max displacement 5.0 um), routed with zero final
+DRT violations and zero antenna violations, and its focused WC check also
+remained -0.778950 ns.
+
+The combined branch was then built from the persisted place24936 resize and
+applied the place25436 resize. It legalized with max displacement 5.0 um and
+completed detailed routing with zero DRT violations plus zero antenna net/pin
+violations. Cleanup was requested before extracted timing was run, so this
+latest branch is retained as an unvalidated continuation point rather than
+called closed.
+
+Cleanup removed superseded split2–split6, moved, top-electrical, and isolated
+resize databases/DEFs/SPEFs while retaining source scripts, logs, reports,
+split7, baseline 5_route/6_final, and the combined route/legalized SDC. Free
+space increased from about 8 GB to about 50 GB.

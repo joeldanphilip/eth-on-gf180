@@ -250,6 +250,81 @@ eco-legalize-split7:
 .PHONY: eco-route-split7
 eco-route-split7:
 	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_split7:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_worst_buffer_split7.tcl' eco_route_split7
+.PHONY: eco-insert-top-electrical-splits
+eco-insert-top-electrical-splits:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_insert_top_electrical_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/insert_top_electrical_splits.tcl' eco_insert_top_electrical_splits
+.PHONY: eco-legalize-top-electrical-splits
+eco-legalize-top-electrical-splits:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_top_electrical_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_top_electrical_splits.tcl' eco_legalize_top_electrical_splits
+.PHONY: eco-route-top-electrical-splits
+eco-route-top-electrical-splits:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_top_electrical_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_top_electrical_splits.tcl' eco_route_top_electrical_splits
+.PHONY: eco-insert-top-electrical-small-splits
+eco-insert-top-electrical-small-splits:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_insert_top_electrical_small_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/insert_top_electrical_small_splits.tcl' eco_insert_top_electrical_small_splits
+.PHONY: eco-legalize-top-electrical-small-splits
+eco-legalize-top-electrical-small-splits:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_top_electrical_small_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_top_electrical_small_splits.tcl' eco_legalize_top_electrical_small_splits
+.PHONY: eco-route-top-electrical-small-splits
+eco-route-top-electrical-small-splits:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_top_electrical_small_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_top_electrical_small_splits.tcl' eco_route_top_electrical_small_splits
+.PHONY: eco-finish-top-electrical-small-splits
+eco-finish-top-electrical-small-splits:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_finish_top_electrical_small_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/finalize_top_electrical_small_splits.tcl' eco_finish_top_electrical_small_splits
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_report_top_electrical_small_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/report_top_electrical_small_splits.tcl' eco_report_top_electrical_small_splits
+.PHONY: eco-extract-top-electrical-small-splits
+eco-extract-top-electrical-small-splits:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_extract_top_electrical_small_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/extract_top_electrical_small_splits.tcl' eco_extract_top_electrical_small_splits
+.PHONY: eco-check-top-electrical-small-splits
+eco-check-top-electrical-small-splits:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_check_top_electrical_small_splits:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/check_top_electrical_small_splits.tcl' eco_check_top_electrical_small_splits
+.PHONY: eco-resize-setup-place24936
+eco-resize-setup-place24936:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_resize_setup_place24936:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/resize_setup_place24936.tcl' eco_resize_setup_place24936
+.PHONY: eco-legalize-setup-place24936
+eco-legalize-setup-place24936:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_setup_place24936:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_setup_place24936.tcl' eco_legalize_setup_place24936
+.PHONY: eco-route-setup-place24936
+eco-route-setup-place24936:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_setup_place24936:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_setup_place24936.tcl' eco_route_setup_place24936
+.PHONY: eco-finish-setup-place24936
+eco-finish-setup-place24936:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_finish_setup_place24936:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/finalize_setup_place24936.tcl' eco_finish_setup_place24936
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_report_setup_place24936:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/report_setup_place24936.tcl' eco_report_setup_place24936
+.PHONY: eco-extract-setup-place24936
+eco-extract-setup-place24936:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_extract_setup_place24936:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/extract_setup_place24936.tcl' eco_extract_setup_place24936
+.PHONY: eco-check-setup-place24936
+eco-check-setup-place24936:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_check_setup_place24936:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/check_setup_place24936.tcl' eco_check_setup_place24936
+.PHONY: eco-resize-setup-place25436
+eco-resize-setup-place25436:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_resize_setup_place25436:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/resize_setup_place25436.tcl' eco_resize_setup_place25436
+.PHONY: eco-legalize-setup-place25436
+eco-legalize-setup-place25436:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_setup_place25436:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_setup_place25436.tcl' eco_legalize_setup_place25436
+.PHONY: eco-route-setup-place25436
+eco-route-setup-place25436:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_setup_place25436:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_setup_place25436.tcl' eco_route_setup_place25436
+.PHONY: eco-resize-setup-combined
+eco-resize-setup-combined:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_resize_setup_combined:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/resize_setup_combined.tcl' eco_resize_setup_combined
+.PHONY: eco-legalize-setup-combined
+eco-legalize-setup-combined:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_legalize_setup_combined:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/legalize_setup_combined.tcl' eco_legalize_setup_combined
+.PHONY: eco-route-setup-combined
+eco-route-setup-combined:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_route_setup_combined:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/detail_route_setup_combined.tcl' eco_route_setup_combined
+.PHONY: eco-finish-setup-place25436
+eco-finish-setup-place25436:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_finish_setup_place25436:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/finalize_setup_place25436.tcl' eco_finish_setup_place25436
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_report_setup_place25436:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/report_setup_place25436.tcl' eco_report_setup_place25436
+.PHONY: eco-extract-setup-place25436
+eco-extract-setup-place25436:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_extract_setup_place25436:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/extract_setup_place25436.tcl' eco_extract_setup_place25436
+.PHONY: eco-check-setup-place25436-wc
+eco-check-setup-place25436-wc:
+	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_check_setup_place25436_wc:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/check_setup_place25436_wc.tcl' eco_check_setup_place25436_wc
 .PHONY: eco-resize-read-controls-round2
 eco-resize-read-controls-round2:
 	$(MAKE) -C $(FLOW_DIR) DESIGN_CONFIG=$(PROJECT_DIR)/physical/pipeline_eco_design.mk --eval='eco_read_controls_resize_round2:; @$$(OPENROAD_CMD) $(PROJECT_DIR)/physical/resize_read_controls_round2.tcl' eco_read_controls_resize_round2

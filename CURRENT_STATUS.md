@@ -1,5 +1,27 @@
 # Current measured status
 
+## Latest cleanup and ECO checkpoint — 2026-11-03
+
+Cleanup stopped after the combined place24936/place25436 route completed. The
+latest combined route reached a final detailed-route violation count of zero
+and zero antenna net/pin violations, but it has not yet undergone extracted
+STA, so it is not a signoff candidate. The preserved known-good checkpoint
+remains split7: WC setup -0.778950 ns, WC electrical clean, BC/TC max-slew
+violations present. The combined route and legalization SDC are retained for a
+future continuation.
+
+The four-buffer electrical branch was also routed with zero DRT and zero
+antenna violations, but extracted slack stayed WC -0.778950 ns; BC/TC slew
+violations remained. A place24936 buf_8-to-buf_20 branch and a place25436
+buf_12-to-buf_20 branch each preserved zero-DRT routing but did not improve
+the extracted WC worst slack in isolation. These are documented experiments,
+not closure claims.
+
+Superseded split2–split6, moved, top-electrical, and isolated resize ODB/DEF/
+SPEF payloads were removed after their logs and reports were retained. Free
+space increased to approximately 50 GB. Split7, baseline 5_route/6_final,
+the latest combined route, source scripts, logs, and reports remain.
+
 ## Latest physical ECO checkpoint — 2026-11-02
 
 The strongest legally routed/extracted candidate is split7. It has zero final
