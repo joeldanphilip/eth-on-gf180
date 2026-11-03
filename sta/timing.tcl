@@ -13,11 +13,17 @@ if {[info exists ::env(LIB_MAX)] && [info exists ::env(LIB_MIN)]} {
     read_liberty $typical
     puts "Timing library: Nangate45 typical (single-corner estimate)"
 }
+if {[info exists ::env(LIB_AUX)]} {
+    read_liberty $::env(LIB_AUX)
+    puts "Auxiliary timing library: $::env(LIB_AUX)"
+}
 set netlist build/mac_mapped.v
 if {[info exists ::env(NETLIST)]} {set netlist $::env(NETLIST)}
 read_verilog $netlist
 link_design eth_mac_1g_fifo
-read_sdc sta/mac.sdc
+set sdc sta/mac.sdc
+if {[info exists ::env(SDC_FILE)]} {set sdc $::env(SDC_FILE)}
+read_sdc $sdc
 check_setup -verbose
 report_checks -path_delay max -group_path_count 5 -format full_clock_expanded -fields {slew cap fanout}
 report_checks -path_delay min -group_path_count 5 -format full_clock_expanded -fields {slew cap fanout}

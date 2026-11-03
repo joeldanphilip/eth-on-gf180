@@ -1,5 +1,34 @@
 # Current measured status
 
+## Sky130 macro-backed closure checkpoint — 2026-11-04
+
+The active branch is `sky130-1r1w-ethernet`.  The Sky130HD physical flow uses
+the VLSIDA `sky130_sram_2kbyte_1rw1r_32x512_8` 1RW1R macro (8 instances, real
+LEF/GDS/Liberty/SP views) for the two 4096-byte frame FIFOs.  RTL simulation
+passes (`1 passed`), synthesis maps eight SRAM macros, placement/CTS/routing
+complete, and detailed routing converges to zero violations.
+
+The repaired final database is `build/sky130/fixed_final.odb`, with DEF/GDS at
+`build/sky130/fixed_final.def` and `build/sky130/fixed_final.gds`.  Independent
+post-route checks report setup worst slack **+0.62 ns**, hold worst slack
+**+0.13 ns**, setup/hold violation counts zero, max-slew/max-cap violations
+zero, legal placement, and router DRC zero.  The final critical path is
+`_5108_/Q -> rx_axis_tlast` at +0.62 ns.  A targeted same-footprint-compatible
+upsizing of `_2902_` from `nand3b_1` to `nand3b_2` removed the last -0.01 ns
+slew and -0.00 ns capacitance violations; the affected nets were incrementally
+routed and rechecked.
+
+KLayout stream-out confirms all LEF cells have matching GDS/OAS cells and no
+orphan cells.  The Sky130HD DRC deck completed on the top-level integration
+geometry with SRAM interiors excluded, reporting two `m4.4` markers exactly at
+empty macro-boundary placeholders.  The same deck on the supplied SRAM GDS
+reports internal macro-cell markers (`m1.4`, `li.1`, `m4.4`, etc.); these are
+inside the pre-hardened OpenRAM macro hierarchy and are not top-level route
+violations.  Treat the integration as timing/router-DRC closed with macro DRC
+acceptance still requiring the macro provider's hardened signoff or a macro
+specific deck.  Full filler-inclusive KLayout DRC exceeded the workspace
+memory budget before writing a report; the final GDS itself is preserved.
+
 ## Latest cleanup and ECO checkpoint — 2026-11-03
 
 Cleanup stopped after the combined place24936/place25436 route completed. The
@@ -312,3 +341,54 @@ violations), with no orphan GDS cells. However, extracted 125 MHz STA reports
 worst setup slack **-1.6206 ns** and worst hold slack **+0.0654 ns**. Timing
 closure is therefore not achieved. The two planned closure attempts are
 exhausted; do not claim this GDS as timing-signoff-ready.
+
+## Active SRAM branch — 2026-11-03
+
+The official GF180 `sram512x8m8wm1` hard macro is now integrated behind a
+two-slot ping-pong frame FIFO. Functional multiclock regression passes 4/4
+cases and macro mapping is structurally clean. Pre-layout STA is not closed
+(`-11.4639 ns` setup, `-0.9702 ns` hold); the current slot clock mux causes
+multiple-clock warnings at SRAM pins and needs a proper physical clock
+implementation before GDS work resumes.
+
+The full upstream cocotb suite is not yet a pass: the 4096-byte run exceeded
+one hour and was stopped; a 512-byte bounded run completed but correctly
+failed oversized-frame cases. The focused multiclock suite is the passing
+functional evidence currently retained.
+
+## Latest SRAM timing iteration — 2026-11-03
+
+The active SRAM RTL passes the focused 4096-byte multiclock regression (all
+four cocotb cases). Frame metadata is now stored per ping-pong slot, source
+backpressure uses registered frame credits, and SRAM reads use a registered
+request/Q pipeline with a request-domain prime counter.
+
+Latest mapped pre-layout STA at the 8 ns target is still failing worst setup at
+**-7.4944 ns** and worst hold at **-0.9702 ns**. The SRAM macro request path
+itself is **-7.13 ns**, dominated by the half-cycle request-register to macro
+interface. This is not a closed timing result and no SRAM-backed GDS run has
+been launched from it. The prior routed GDS remains the only physical
+artifact, with setup **-1.6206 ns** and hold **+0.0654 ns**.
+
+## Latest measured branch — 2026-11-04
+
+The RX CRC-lookahead RTL passes the focused SRAM regression (all four cocotb
+cases). Final mapped pre-layout OpenSTA for that branch reports worst setup
+**-7.1341 ns** and worst hold **-0.9702 ns**. The RX CRC path is no longer the
+limiting path; the SRAM request-to-address path is now dominant at roughly
+**-7.13 ns** because the current single-port macro handoff launches requests
+on the falling edge and captures them on the rising edge.
+
+Full-cycle request and ownership-delay rewrites were tested, failed functional
+alignment under the synchronous macro model, and were reverted. The current
+RTL is the passing negative-edge request branch. The SRAM clock mux still
+produces multiple-clock warnings, so no SRAM-backed GDS or timing-signoff claim
+is justified yet.
+
+The rejected registered-macro experiment has been removed. The restored
+default SRAM branch was rerun on 2026-11-04 and passed all four internal
+functional cases (`1 passed in 10.11 s`).
+
+The available GF180 SRAM package contains only single-port `64x8`, `128x8`,
+`256x8`, and `512x8` macros; no characterized 1R1W/dual-port option is
+available locally. Public GF180/OpenRAM sources do not provide one either.

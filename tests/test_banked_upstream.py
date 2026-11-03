@@ -13,6 +13,10 @@ def test_banked_upstream():
                ['eth_mac_1g_fifo','eth_mac_1g','axis_gmii_rx','axis_gmii_tx','lfsr']]
     sources += [axis/'axis_adapter.v', ROOT/'rtl/axis_async_fifo_banked.v',
                 axis/'axis_async_fifo_adapter.v']
+    if os.environ.get('SKY130_SRAM_FRAME') == '1':
+        macro_dir = ROOT/'build/sky130_sram_macros/sky130_sram_2kbyte_1rw1r_32x512_8'
+        sources = [ROOT/'rtl/axis_async_fifo_sky130_1rw1r_frame.v' if path.name == 'axis_async_fifo_banked.v' else path for path in sources]
+        sources += [ROOT/'rtl/sky130_sram_2kbyte_1rw1r_32x512_8.v', macro_dir/'sky130_sram_2kbyte_1rw1r_32x512_8.v']
     closure = os.environ.get('CLOSURE_RTL') == '1'
     registered = os.environ.get('REGISTERED_FIFO') == '1'
     lookahead_args = ['-DFULL_LOOKAHEAD'] if os.environ.get('FULL_LOOKAHEAD') == '1' else []
@@ -34,4 +38,4 @@ def test_banked_upstream():
         parameters={'TX_FIFO_DEPTH':int(os.environ.get('TEST_FIFO_DEPTH', '4096')), 'RX_FIFO_DEPTH':int(os.environ.get('TEST_FIFO_DEPTH', '4096')),
                     'TX_FIFO_RAM_PIPELINE':read_pipeline, 'RX_FIFO_RAM_PIPELINE':read_pipeline},
         compile_args=simulator_args + lookahead_args + (['-DONEHOT_WRITE'] if closure else []) + (['-DREGISTER_FULL_FLAGS'] if registered else []) + (['-DELASTIC_READ'] if os.environ.get('ELASTIC_READ') == '1' else []) + (['-DFAST_CONTROL'] if os.environ.get('FAST_CONTROL') == '1' else []) + (['-DREGISTER_EMPTY'] if os.environ.get('REGISTER_EMPTY') == '1' else []),
-        sim_build=str(ROOT/('build/physical_pipeline_upstream' if os.environ.get('PHYSICAL_PIPELINE') == '1' else 'build/registered_upstream' if registered else 'build/closure_upstream' if closure else 'build/banked_upstream')))
+        sim_build=str(ROOT/('build/sky130_upstream' if os.environ.get('SKY130_SRAM_FRAME') == '1' else 'build/physical_pipeline_upstream' if os.environ.get('PHYSICAL_PIPELINE') == '1' else 'build/registered_upstream' if registered else 'build/closure_upstream' if closure else 'build/banked_upstream')))

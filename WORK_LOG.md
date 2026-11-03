@@ -1,5 +1,52 @@
 # Engineering work log — 2026-10-31
 
+## 2026-11-04 — Sky130 SRAM-backed physical closure
+
+The register-bank implementation was not a credible macro-based ASIC result,
+so the active branch moved to Sky130HD with the public VLSIDA
+`sky130_sram_2kbyte_1rw1r_32x512_8` hard macro.  The macro repository was
+pinned to commit `965df150c754fe2b3f93a0bd1f9883eb114279b2`; the design uses
+eight macro instances, four per TX/RX ping-pong FIFO.  The physical wrapper
+keeps power pins explicit and the simulation wrapper uses the vendor behavioral
+model, so functional tests and physical integration use the same logical macro.
+
+The Sky130 flow sequence and evidence were:
+
+- Sky130 RTL simulation: `tests/test_multiclock.py`, 1 passing focused test.
+- Yosys mapping: eight SRAM macro instances in `build/sky130/mac_mapped.v`.
+- OpenSTA prelayout: positive setup/hold slack at the 8 ns clocks.
+- Macro placement: fixed coordinates aligned to Sky130 row boundaries; the
+  real OpenROAD placement checker passed after post-tapcell legalization.
+- PDN: explicit OpenDB reconnect of all `vccd1`/`vssd1` macro ITerms to VDD/VSS
+  was required because this OpenROAD build imported black-box power ITerms as
+  SIGNAL.  The saved database confirms every macro terminal is on VDD/VSS.
+- Placement and CTS: legal placement, three independent clock trees, no setup
+  or hold timing violations in the final report.
+- Detailed route: initial antenna repair iterations converged to **0** router
+  DRC violations; filler placement then completed.
+- Final electrical ECO: `_2902_` was upsized from `sky130_fd_sc_hd__nand3b_1`
+  to `sky130_fd_sc_hd__nand3b_2`; incremental routing produced
+  `build/sky130/fixed_final.odb` and `build/sky130/fix_drc.rpt` with zero
+  detailed-router violations.
+- Independent final STA: `physical/check_fixed.tcl` reports setup +0.62 ns,
+  hold +0.13 ns, and no max-slew/max-cap violations.
+- Stream-out: `build/sky130/fixed_final.gds`; KLayout reported matching GDS/OAS
+  cells and no orphan cells.
+
+The installed ORFS snapshot is older than the installed OpenROAD binary.  The
+local compatibility edits remove unsupported `-placeable`/`-quiet` flags and
+use a supported full placement check.  OpenRCX's removed
+`set_extraction_rules_file` command required the final report to use the
+supported global-route parasitic estimate.  These are tool-version issues,
+not timing or routing bypasses.
+
+KLayout DRC completed for the top-level integration GDS with macro interiors
+omitted, but found two `m4.4` markers at the empty macro placeholders.  The
+macro-included report completed and showed 256,958 markers entirely within the
+pre-hardened OpenRAM cells; no top-level `eth_mac_1g_fifo` markers were present.
+This is recorded as a macro-provider signoff boundary, not hidden as a clean
+full-chip DRC claim.
+
 ## Objective and architecture
 
 Build an open-source study of formal verification and multi-clock timing for a
@@ -1196,3 +1243,96 @@ The extracted 125 MHz result is **not timing closed**: worst setup slack is
 routed/GDS experiment with clean routing and antenna checks, not a signoff-ready
 Ethernet MAC. The two-attempt limit is exhausted; further closure would require
 a new architectural/physical strategy rather than another buffer-only ECO.
+
+## 2026-11-03 — SRAM macro-backed FIFO branch
+
+The next architecture uses the official GF180 MCU single-port 512x8 SRAM
+macro `gf180mcu_fd_ip_sram__sram512x8m8wm1`, with LEF, GDS, CDL, Verilog, and
+Liberty views fetched into `build/gf180_sram_ip/`. Because the macro is
+single-port, each frame FIFO uses two ping-pong slots: a slot is written only
+in the source clock domain and then read only in the destination clock domain.
+
+The four-case multiclock regression passes (`1 passed in 18.64 s`), Yosys
+preserves 32 SRAM macro instances, and its structural check reports zero
+problems. Pre-layout OpenSTA is not closed: worst setup is -11.4639 ns and
+worst hold is -0.9702 ns. It also reports 32 SRAM pins with multiple clocks
+from the current combinational slot-clock mux. This must be replaced with a
+proper physical clock-ownership implementation before a credible SRAM-backed
+GDS run; no signoff is claimed.
+
+The superseded physical trees `build/physical_pipeline_layout`, `build/gf180`,
+`build/multiclock_registered_4096`, and `build/registered_upstream` were
+removed, reclaiming about 16 GiB. Temporary SRAM smoke benches and their
+generated directories were also removed; the prior failed GDS tree and its
+reports remain intact.
+
+The 4096-byte upstream cocotb suite was allowed to run for 1 h 10 min but
+did not complete; it was stopped and recorded as a simulator/runtime failure.
+A bounded 512-byte run completed in 48.24 s but all eight upstream cases
+failed because the suite intentionally exercises frames larger than that
+reduced FIFO depth, so it is not a valid full-capacity result. The focused
+four-case multiclock test remains the valid SRAM functional result. Both
+failed simulator build trees were removed during cleanup.
+
+## 2026-11-03 — SRAM timing-closure iteration
+
+The SRAM branch was corrected and retested with a frame-level metadata model:
+each ping-pong slot stores one frame length/user entry instead of synthesizing
+per-byte `last_mem/user_mem` muxes. The focused 4096-byte multiclock regression
+passes all four cases; the pytest wrapper reports `1 passed` because the test
+module runs the four cocotb cases internally.
+
+The source-side full comparator was replaced by a registered two-frame credit
+counter, and the SRAM read side now uses a registered request/Q pipeline with
+request-domain chaining and a four-cycle clock-ownership prime counter. These
+changes removed the earlier same-cycle control-to-address path and reduced
+pre-layout worst setup from -11.4639 ns to -7.4944 ns at the 8 ns target
+(the SRAM macro request path itself is -7.13 ns); worst hold is -0.9702 ns.
+The latest run still reports a half-cycle falling-edge request-to-SRAM path and
+is not timing closed. The latest verified RTL branch is the negative-edge
+request pipeline; a positive-edge request variant failed the cocotb regression
+and was reverted. No new physical/GDS run was started.
+
+## 2026-11-04 — RX lookahead measurement and SRAM-interface experiments
+
+The locally maintained `rtl/axis_gmii_rx_lookahead.v` was selected without
+modifying the dirty vendor checkout. Its focused SRAM regression passed all
+four cocotb cases. Mapping and OpenSTA were rerun with the official
+`gf180mcu_fd_ip_sram__sram512x8m8wm1` Liberty, producing worst setup
+**-7.1341 ns** and worst hold **-0.9702 ns**. This removed the previous
+vendor GMII RX CRC critical path; the remaining worst setup path is the
+falling-edge request register into the SRAM macro address, at about
+**-7.13 ns**.
+
+Two full-cycle SRAM-request experiments were measured and rejected. A
+posedge-only scheduler failed all four functional cases; registered macro
+interface and ownership-delay variants still duplicated the first byte. They
+were reverted, and the verified negative-edge branch was rerun successfully.
+No unverified timing workaround or false path was retained.
+
+The GF180 SRAM Makefile flow now supports separate build directories and a
+selectable RX RTL file, allowing this exact comparison to be reproduced with
+`GF180_SRAM_RX_RTL=rtl/axis_gmii_rx_lookahead.v`. The rejected experiment
+directory and temporary debug log were removed. No new physical GDS run was
+started because pre-layout timing still fails and the muxed SRAM clock pins
+still report multiple-clock warnings.
+
+The rejected `SRAM_FIFO_REGISTERED_MACRO` compile-time experiment was removed
+from both RTL and the cocotb harness, along with its temporary debug log. The
+restored default SRAM branch was rerun on 2026-11-04 with
+`SRAM_FRAME_FIFO=1 CLOSURE_RTL=1 TEST_FIFO_DEPTH=4096 SIM=verilator`; all four
+internal cases passed (`1 passed in 10.11 s`).
+
+The cloned GF180 SRAM collateral was rechecked: it provides only
+`64x8m8wm1`, `128x8m8wm1`, `256x8m8wm1`, and `512x8m8wm1` single-port macros;
+no characterized 1R1W or dual-port macro is present. Therefore the current
+timing issue cannot be solved by selecting a hidden alternate macro from this
+PDK package.
+
+The public GF180 sources were checked again on 2026-11-04. The official
+GF180 SRAM IP and SRAM build-space repositories expose single-port memories
+only, while the current OpenRAM documentation states that GF180 SRAM
+generation is unsupported. No compatible open 1R1W/dual-port GF180 macro with
+LEF, GDS, CDL, and Liberty views was found. A true dual-port replacement would
+therefore require licensed foundry IP or a custom memory compiler/layout; it
+must not be represented by an uncharacterized black box.

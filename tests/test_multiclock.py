@@ -89,10 +89,15 @@ def test_multiclock():
     sources += [axis / (x+'.v') for x in ['axis_adapter','axis_async_fifo','axis_async_fifo_adapter']]
     parameters = {'TX_FIFO_DEPTH':FIFO_DEPTH,'RX_FIFO_DEPTH':FIFO_DEPTH}
     banked = os.environ.get('BANKED_FIFO') == '1'
+    sky130_sram = os.environ.get('SKY130_SRAM_FRAME') == '1'
     if banked:
         sources = [ROOT/'rtl/axis_async_fifo_banked.v' if x.name == 'axis_async_fifo.v' else x for x in sources]
         read_pipeline = int(os.environ.get('FIFO_RAM_PIPELINE', '2'))
         parameters.update(TX_FIFO_RAM_PIPELINE=read_pipeline, RX_FIFO_RAM_PIPELINE=read_pipeline)
+    if sky130_sram:
+        macro_dir = ROOT/'build/sky130_sram_macros/sky130_sram_2kbyte_1rw1r_32x512_8'
+        sources = [ROOT/'rtl/axis_async_fifo_sky130_1rw1r_frame.v' if x.name == 'axis_async_fifo.v' else x for x in sources]
+        sources += [ROOT/'rtl/sky130_sram_2kbyte_1rw1r_32x512_8.v', macro_dir/'sky130_sram_2kbyte_1rw1r_32x512_8.v']
     closure = os.environ.get('CLOSURE_RTL') == '1'
     registered = os.environ.get('REGISTERED_FIFO') == '1'
     lookahead_args = ['-DFULL_LOOKAHEAD'] if os.environ.get('FULL_LOOKAHEAD') == '1' else []
@@ -107,8 +112,10 @@ def test_multiclock():
     if closure:
         sources = [ROOT/'rtl/axis_gmii_rx_lookahead.v' if x.name == 'axis_gmii_rx.v' else x for x in sources]
     simulator_args = ['--Wno-fatal'] if os.environ.get('SIM') == 'verilator' else []
+    if sky130_sram and os.environ.get('SIM') == 'verilator':
+        simulator_args += ['--timing']
     run(verilog_sources=[str(x) for x in sources], toplevel='eth_mac_1g_fifo',
         module='test_multiclock', python_search=[str(ROOT/'tests')],
         parameters=parameters,
-            compile_args=simulator_args + lookahead_args + (['-DONEHOT_WRITE'] if closure else []) + (['-DREGISTER_FULL_FLAGS'] if registered else []) + (['-DELASTIC_READ'] if os.environ.get('ELASTIC_READ') == '1' else []) + (['-DFAST_CONTROL'] if os.environ.get('FAST_CONTROL') == '1' else []) + (['-DREGISTER_EMPTY'] if os.environ.get('REGISTER_EMPTY') == '1' else []),
-        sim_build=str(ROOT/(f'build/multiclock_physical_pipeline_{FIFO_DEPTH}' if os.environ.get('PHYSICAL_PIPELINE') == '1' else f'build/multiclock_registered_{FIFO_DEPTH}' if registered else f'build/multiclock_closure_{FIFO_DEPTH}' if closure else f'build/multiclock_banked_{FIFO_DEPTH}' if banked else 'build/multiclock')))
+        compile_args=simulator_args + lookahead_args + (['-DONEHOT_WRITE'] if closure else []) + (['-DREGISTER_FULL_FLAGS'] if registered else []) + (['-DELASTIC_READ'] if os.environ.get('ELASTIC_READ') == '1' else []) + (['-DFAST_CONTROL'] if os.environ.get('FAST_CONTROL') == '1' else []) + (['-DREGISTER_EMPTY'] if os.environ.get('REGISTER_EMPTY') == '1' else []),
+        sim_build=str(ROOT/(f'build/multiclock_sky130_{FIFO_DEPTH}' if sky130_sram else f'build/multiclock_physical_pipeline_{FIFO_DEPTH}' if os.environ.get('PHYSICAL_PIPELINE') == '1' else f'build/multiclock_registered_{FIFO_DEPTH}' if registered else f'build/multiclock_closure_{FIFO_DEPTH}' if closure else f'build/multiclock_banked_{FIFO_DEPTH}' if banked else 'build/multiclock')))
