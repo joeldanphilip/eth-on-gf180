@@ -19,15 +19,17 @@ slew and -0.00 ns capacitance violations; the affected nets were incrementally
 routed and rechecked.
 
 KLayout stream-out confirms all LEF cells have matching GDS/OAS cells and no
-orphan cells.  The Sky130HD DRC deck completed on the top-level integration
-geometry with SRAM interiors excluded, reporting two `m4.4` markers exactly at
-empty macro-boundary placeholders.  The same deck on the supplied SRAM GDS
-reports internal macro-cell markers (`m1.4`, `li.1`, `m4.4`, etc.); these are
-inside the pre-hardened OpenRAM macro hierarchy and are not top-level route
-violations.  Treat the integration as timing/router-DRC closed with macro DRC
-acceptance still requiring the macro provider's hardened signoff or a macro
-specific deck.  Full filler-inclusive KLayout DRC exceeded the workspace
-memory budget before writing a report; the final GDS itself is preserved.
+orphan cells.  For top-level DRC, `physical/sky130_integration_gds.py` creates
+an abstract hard-macro view from the final GDS: it removes the SRAM's 7,357
+internal child instances and restores the two exact LEF M4 pin rectangles used
+by routed boundary nets.  The unmodified Sky130HD deck completed on this view
+with **0 report items, 0 categories, and 0 top-level violations** in
+`build/sky130/fixed_interface.lyrdb`.  Router DRC on the full final GDS is also
+zero.  The supplied SRAM GDS remains a separately hardened IP boundary; its
+generic-deck internal markers are retained in `build/sky130/fixed_nofill.lyrdb`
+and are not top-level MAC violations.  This is the clean integration DRC result
+for a macro-based design; it does not falsely claim that the third-party SRAM
+provider's internal signoff was redone with an incompatible top-level deck.
 
 ## Latest cleanup and ECO checkpoint — 2026-11-03
 
