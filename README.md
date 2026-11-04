@@ -16,11 +16,13 @@ The active deliverable is branch `sky130-1r1w-ethernet`:
 - Clean top-level integration DRC: **0 report items**
 - Final GDS: `build/sky130/fixed_final.gds`, tracked with Git LFS
 
-![Final routed layout preview](docs/final_layout_preview.png)
+![Final routed layout opened in KLayout](docs/final_layout_klayout.png)
 
-The preview shows the 4×2 SRAM macro floorplan and standard-cell region. The
-GDS is the authoritative layout artifact. See [CURRENT_STATUS.md](CURRENT_STATUS.md)
-for measured results and [WORK_LOG.md](WORK_LOG.md) for the engineering log.
+This is a screenshot of the authoritative routed GDS opened in KLayout 0.30.12;
+it shows the 4×2 SRAM macro floorplan, standard-cell rows, and routed metal.
+The GDS itself—not the screenshot—is the signoff artifact. See
+[CURRENT_STATUS.md](CURRENT_STATUS.md) for measured results and
+[WORK_LOG.md](WORK_LOG.md) for the engineering log.
 
 The SRAM is third-party hard IP. Top-level DRC checks the MAC, standard cells,
 macro boundary, and routing using a hard-macro integration view; the SRAM
@@ -36,9 +38,19 @@ cd eth-on-gf180
 git lfs pull
 ```
 
-The final GDS and layout preview are included in the remote branch. The DEF,
+The final GDS and KLayout screenshot are included in the remote branch. The DEF,
 ODB, DRC report, and STA report are retained in the local build workspace and
 are listed below for reproducibility.
+
+To inspect the actual layout locally:
+
+```sh
+QT_QPA_PLATFORM=xcb physical/bin/klayout-native build/sky130/fixed_final.gds
+```
+
+The screenshot above was captured from KLayout; it is not a floorplan
+approximation. The launcher defaults to offscreen mode for CI; setting
+`QT_QPA_PLATFORM=xcb` opens the normal desktop GUI.
 
 ## Historical GF180 study
 
@@ -58,7 +70,8 @@ physical closure above is the current ASIC deliverable.
   items.
 - `tools/ORFS/flow/reports/sky130hd/ethernet_sky130_4096/base/6_finish.rpt` —
   final routed STA report.
-- `docs/final_layout_preview.png` — lightweight floorplan preview.
+- `docs/final_layout_klayout.png` — screenshot captured from KLayout showing
+  the routed GDS.
 
 Generated build files are ignored by default; the final GDS is force-added via
 Git LFS because it is larger than GitHub's normal blob limit.
