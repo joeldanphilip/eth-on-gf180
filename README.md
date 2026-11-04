@@ -1,20 +1,67 @@
-# Formal Verification and Multi-Clock STA of a 1G Ethernet MAC
+# 1G Ethernet MAC — Sky130 SRAM-backed ASIC flow
 
-Read [CURRENT_STATUS.md](CURRENT_STATUS.md) first: the 4096-entry MAC achieves
-125 MHz pre-layout setup/hold closure using GF180 180 nm at the native 5 V
-corners. SS setup is +0.0515 ns and FF hold +0.1578 ns; TT also passes. Packet
-tests, bounded FIFO checks and component/invariant induction proofs pass.
-Full-MAC unbounded proof and routed physical signoff remain outstanding.
+This repository contains an open-source RTL, formal-verification, multi-clock
+STA, placement, routing, and GDS delivery flow for a 1G Ethernet MAC with
+independent logic, TX, and RX clocks.
 
-The active 180 nm target is documented in [TECHNOLOGY.md](TECHNOLOGY.md).
-Run `make -f sta/gf180.mk gf180` for the original GF180 baseline or
-`make -f sta/gf180.mk gf180-banked` for the pipelined FIFO candidate.
-Run `make formal-frame` for the additional bounded frame-commit checks.
-`make sta` now selects the sized GF180 banked implementation at 3.3 V nominal.
-`make sta-candidate` evaluates the one-hot-write / CRC-lookahead derivative at
-5 V nominal. The earlier Nangate45
-flow is retained as `make sta-nangate`. `make formal-banked` compares the FIFO
-variant with the upstream pipeline-two reference on a reduced model.
+## Current delivery
+
+The active deliverable is branch `sky130-1r1w-ethernet`:
+
+- Sky130HD, 1.8 V, 125 MHz / 8 ns target
+- 4096-entry TX/RX frame FIFOs
+- Eight real `sky130_sram_2kbyte_1rw1r_32x512_8` hard macros
+- Post-route setup slack **+0.62 ns** and hold slack **+0.13 ns**
+- Zero max-slew/max-cap violations and zero detailed-route DRC violations
+- Clean top-level integration DRC: **0 report items**
+- Final GDS: `build/sky130/fixed_final.gds`, tracked with Git LFS
+
+![Final routed layout preview](docs/final_layout_preview.png)
+
+The preview shows the 4×2 SRAM macro floorplan and standard-cell region. The
+GDS is the authoritative layout artifact. See [CURRENT_STATUS.md](CURRENT_STATUS.md)
+for measured results and [WORK_LOG.md](WORK_LOG.md) for the engineering log.
+
+The SRAM is third-party hard IP. Top-level DRC checks the MAC, standard cells,
+macro boundary, and routing using a hard-macro integration view; the SRAM
+provider owns internal macro signoff. The generic deck's internal macro markers
+are retained as evidence and are not top-level MAC violations.
+
+## Get the final GDS
+
+```sh
+git lfs install
+git clone -b sky130-1r1w-ethernet git@github.com:joeldanphilip/eth-on-gf180.git
+cd eth-on-gf180
+git lfs pull
+```
+
+The final GDS and layout preview are included in the remote branch. The DEF,
+ODB, DRC report, and STA report are retained in the local build workspace and
+are listed below for reproducibility.
+
+## Historical GF180 study
+
+The remainder of this README retains the original GF180 formal/STA study and
+its replay commands. Those results are historical; the Sky130 macro-backed
+physical closure above is the current ASIC deliverable.
+
+## Delivered artifacts
+
+- `build/sky130/fixed_final.gds` — complete routed GDS with standard cells,
+  fillers, and eight SRAM macro instances.
+- `build/sky130/fixed_final.def` — final routed DEF.
+- `build/sky130/fixed_final.odb` — final OpenROAD database.
+- `build/sky130/fixed_interface.gds` — hard-macro integration view used for
+  top-level DRC.
+- `build/sky130/fixed_interface.lyrdb` — full Sky130HD DRC report with zero
+  items.
+- `tools/ORFS/flow/reports/sky130hd/ethernet_sky130_4096/base/6_finish.rpt` —
+  final routed STA report.
+- `docs/final_layout_preview.png` — lightweight floorplan preview.
+
+Generated build files are ignored by default; the final GDS is force-added via
+Git LFS because it is larger than GitHub's normal blob limit.
 
 Start with [WORK_LOG.md](WORK_LOG.md) for the experiments, failures, fixes and
 evidence, or [INTERVIEW_GUIDE.md](INTERVIEW_GUIDE.md) for an accurate explanation
